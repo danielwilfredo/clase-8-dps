@@ -57,9 +57,7 @@ const PokemonScreen = ()=>{
 
 
 const PokemonScreen2 = ()=>{
-
-  const [elementos2, guardarlista2] = useState([]);
-  const [pokeinfo, setPokeInfo]=useState([])
+const [elementos2, guardarlista2]=useState([]);
 
    useEffect( () => {
      console.log("Ejecutando useEfect")
@@ -68,15 +66,18 @@ const PokemonScreen2 = ()=>{
       const resultado = await fetch('https://pokeapi.co/api/v2/pokemon?offset=0&limit=10').then(response => response.json());
    //   const valor = await requestData2();
       const guardar =resultado.results
+      const pokemonInfo=[];
       for (const url of guardar) {
         console.log("url de guardar", url.url)
         const masinfo = await fetch(url.url).then(response => response.json());
         console.log("mas info", masinfo)
-        setPokeInfo(...pokeinfo, masinfo)
+        const masinfo2= await fetch(masinfo.forms[0].url).then(response => response.json());
+
+        pokemonInfo.push({...guardar, ...masinfo, ...masinfo2})
         
         }
       //console.log("valores pokemon2",guardar[0]?.url)
-      guardarlista2(...pokeinfo, guardar);
+      guardarlista2(pokemonInfo);
     }
     listarPokemon();
 
@@ -87,11 +88,19 @@ const PokemonScreen2 = ()=>{
      <View style={{flex:1}} >
        <Text style={{fontSize:18,textAlign:'center',height:40,marginTop:10,backgroundColor:'lightgray',textAlignVertical:'center', borderRadius:10,marginLeft:10,marginRight:10}}> Pokemones</Text>
               <FlatList
-        data={elementos2, pokeinfo}
-        renderItem={({item, item2})=>
+        data={elementos2}
+        renderItem={({item})=>
             <View>
               <Text style={styles.item}>{item.name}</Text>
-              <Text style={styles.item}>{item2.base_experience}</Text>
+              <Text style={styles.item}>{item.forms[0].url}</Text>
+              <Image
+              style={{
+                width:150,
+                height:150
+              }
+            }
+              source={{uri:item.sprites.front_default}}
+              />
             </View>
         }
         />
