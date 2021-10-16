@@ -56,35 +56,47 @@ const PokemonScreen = ()=>{
 
 
 
-const PokemonScreen2 = async ()=>{
+const PokemonScreen2 = ()=>{
 
   const [elementos2, guardarlista2] = useState([]);
+  const [pokeinfo, setPokeInfo]=useState([])
 
    useEffect( () => {
      console.log("Ejecutando useEfect")
-    const requestData2 = () => fetch('https://pokeapi.co/api/v2/pokemon?offset=0&limit=10', {method: 'GET'}).then((valor) => valor.json());
+    //const requestData2 = () => fetch('https://pokeapi.co/api/v2/pokemon?offset=0&limit=10', {method: 'GET'}).then((valor) => valor.json());
     const listarPokemon = async()=>{
-      const valor = await requestData2();
-      const guardar =valor.results
-      console.log("valores pokemon2",guardar)
-      guardarlista2(guardar);
-      console.log("elementos 2", elementos2)
+      const resultado = await fetch('https://pokeapi.co/api/v2/pokemon?offset=0&limit=10').then(response => response.json());
+   //   const valor = await requestData2();
+      const guardar =resultado.results
+      for (const url of guardar) {
+        console.log("url de guardar", url.url)
+        const masinfo = await fetch(url.url).then(response => response.json());
+        console.log("mas info", masinfo)
+        setPokeInfo(...pokeinfo, masinfo)
+        
+        }
+      //console.log("valores pokemon2",guardar[0]?.url)
+      guardarlista2(...pokeinfo, guardar);
     }
     listarPokemon();
 
   }, [])
 
-  console.log("elementos en pokemon 2", elementos2)
   return(
     <>
      <View style={{flex:1}} >
        <Text style={{fontSize:18,textAlign:'center',height:40,marginTop:10,backgroundColor:'lightgray',textAlignVertical:'center', borderRadius:10,marginLeft:10,marginRight:10}}> Pokemones</Text>
               <FlatList
-        data={elementos2}
-        renderItem={({item})=>
-            <Text style={styles.item}>{item.name}</Text>
+        data={elementos2, pokeinfo}
+        renderItem={({item, item2})=>
+            <View>
+              <Text style={styles.item}>{item.name}</Text>
+              <Text style={styles.item}>{item2.base_experience}</Text>
+            </View>
         }
-      />
+        />
+        <Text>Mas info</Text>
+        
      </View>
     </>
   );
